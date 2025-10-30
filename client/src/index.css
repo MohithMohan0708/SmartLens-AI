@@ -4,24 +4,315 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 text-gray-900 transition-colors duration-200;
+  }
+  
+  .dark body {
+    @apply bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-gray-100;
+  }
+  
+  * {
+    @apply transition-colors duration-200;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
   }
   
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-xl border-2 border-gray-200 hover:border-primary-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200;
+  }
+  
+  .dark .btn-secondary {
+    @apply bg-slate-800 hover:bg-slate-700 text-gray-100 border-slate-700 hover:border-primary-500;
   }
   
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all;
+    @apply w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-primary-100 focus:border-primary-500 outline-none transition-all duration-200 placeholder-gray-400;
+  }
+  
+  .dark .input-field {
+    @apply bg-slate-800 border-slate-700 text-gray-100 placeholder-gray-500 focus:ring-primary-900/50 focus:border-primary-400;
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200;
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 border border-gray-100;
   }
+  
+  .dark .card {
+    @apply bg-slate-800/95 border-slate-700/50 shadow-2xl shadow-black/20;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent;
+  }
+  
+  .dark .gradient-text {
+    @apply from-primary-400 to-blue-400;
+  }
+
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  
+  .dark .glass-effect {
+    @apply bg-slate-900/80 border-slate-700/30 shadow-black/20;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-full;
+}
+
+.dark ::-webkit-scrollbar-track {
+  @apply bg-slate-800 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-400 rounded-full hover:bg-primary-500;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-primary-600 rounded-full hover:bg-primary-500;
+}
+
+/* Dark mode text colors - force override */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: rgb(243 244 246) !important;
+}
+
+.dark p {
+  color: rgb(209 213 219) !important;
+}
+
+.dark label {
+  color: rgb(209 213 219) !important;
+}
+
+.dark span {
+  color: rgb(209 213 219);
+}
+
+.dark .card p,
+.dark .card span,
+.dark .card h1,
+.dark .card h2,
+.dark .card h3,
+.dark .card h4 {
+  color: rgb(209 213 219) !important;
+}
+
+/* Dark mode specific utilities */
+.dark .text-gray-900 {
+  color: rgb(243 244 246) !important;
+}
+
+.dark .text-gray-800 {
+  color: rgb(229 231 235) !important;
+}
+
+.dark .text-gray-700 {
+  color: rgb(209 213 219) !important;
+}
+
+.dark .text-gray-600 {
+  color: rgb(156 163 175) !important;
+}
+
+.dark .text-gray-500 {
+  color: rgb(107 114 128) !important;
+}
+
+.dark .text-gray-400 {
+  color: rgb(156 163 175) !important;
+}
+
+.dark .text-white {
+  color: rgb(243 244 246) !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: rgb(15 23 42);
+}
+
+.dark .bg-gray-100 {
+  background-color: rgb(30 41 59);
+}
+
+.dark .bg-gray-200 {
+  background-color: rgb(51 65 85);
+}
+
+.dark .bg-white {
+  background-color: rgb(30 41 59);
+}
+
+.dark .bg-primary-100 {
+  background-color: rgb(30 58 138);
+}
+
+.dark .bg-blue-100 {
+  background-color: rgb(30 58 138);
+}
+
+.dark .border-gray-100 {
+  border-color: rgb(51 65 85);
+}
+
+.dark .border-gray-200 {
+  border-color: rgb(51 65 85);
+}
+
+.dark .border-gray-300 {
+  border-color: rgb(71 85 105);
+}
+
+.dark .border-yellow-100,
+.dark .border-yellow-200 {
+  border-color: rgb(71 85 105);
+}
+
+.dark .border-blue-100,
+.dark .border-blue-200 {
+  border-color: rgb(71 85 105);
+}
+
+.dark .border-green-100,
+.dark .border-green-200 {
+  border-color: rgb(71 85 105);
+}
+
+.dark .border-red-100,
+.dark .border-red-200 {
+  border-color: rgb(71 85 105);
+}
+
+.dark .border-purple-100,
+.dark .border-purple-200 {
+  border-color: rgb(71 85 105);
+}
+
+/* Dark mode hover states */
+.dark .hover\:bg-gray-50:hover {
+  background-color: rgb(30 41 59);
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: rgb(51 65 85);
+}
+
+.dark .hover\:bg-white\/60:hover {
+  background-color: rgba(30, 41, 59, 0.6);
+}
+
+/* Dark mode for colored backgrounds - ensure text is readable */
+.dark .bg-yellow-50,
+.dark .bg-orange-50,
+.dark .bg-green-50,
+.dark .bg-blue-50,
+.dark .bg-red-50,
+.dark .bg-purple-50 {
+  background-color: rgba(30, 41, 59, 0.5);
+}
+
+/* Dark mode gradient backgrounds */
+.dark [class*="bg-gradient-to"][class*="from-yellow"],
+.dark [class*="bg-gradient-to"][class*="from-green"],
+.dark [class*="bg-gradient-to"][class*="from-blue"],
+.dark [class*="bg-gradient-to"][class*="from-gray"],
+.dark [class*="bg-gradient-to"][class*="from-orange"],
+.dark [class*="bg-gradient-to"][class*="from-red"],
+.dark [class*="bg-gradient-to"][class*="from-purple"] {
+  background-image: linear-gradient(to bottom right, rgb(30 41 59), rgb(51 65 85)) !important;
+}
+
+/* Ensure text on colored backgrounds is visible in dark mode */
+.dark .text-yellow-700,
+.dark .text-yellow-600 {
+  color: rgb(253 224 71) !important;
+}
+
+.dark .text-orange-700,
+.dark .text-orange-600 {
+  color: rgb(251 146 60) !important;
+}
+
+.dark .text-green-700,
+.dark .text-green-600 {
+  color: rgb(134 239 172) !important;
+}
+
+.dark .text-blue-700,
+.dark .text-blue-600 {
+  color: rgb(147 197 253) !important;
+}
+
+.dark .text-red-700,
+.dark .text-red-600 {
+  color: rgb(252 165 165) !important;
+}
+
+.dark .text-purple-700,
+.dark .text-purple-600 {
+  color: rgb(216 180 254) !important;
+}
+
+.dark .text-primary-700,
+.dark .text-primary-600 {
+  color: rgb(56 189 248) !important;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-size: 1000px 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease-out;
 }
