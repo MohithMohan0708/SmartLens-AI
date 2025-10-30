@@ -9,14 +9,14 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = Cookies.get('token');
-    if (token) {
+    // Check if user info exists in localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUser(payload);
+        setUser(JSON.parse(storedUser));
       } catch (error) {
-        console.error('Invalid token');
-        Cookies.remove('token');
+        console.error('Invalid user data');
+        localStorage.removeItem('user');
       }
     }
     setLoading(false);
@@ -25,9 +25,10 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const response = await authAPI.login({ email, password });
     if (response.data.success) {
-      const token = Cookies.get('token');
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      setUser(payload);
+      // Store user info in localStorage since cookie is httpOnly
+      const userInfo = { email, name: response.data.name || email.split('@')[0] };
+      localStorage.setItem('user', JSON.stringify(userInfo));
+      setUser(userInfo);
     }
     return response.data;
   };
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     await authAPI.logout();
     setUser(null);
-    Cookies.remove('token');
+    localStorage.removeItem('user');
   };
 
   return (
