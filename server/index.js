@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import authRouter from "./routes/authRouter.js";
 import cookieParser from "cookie-parser";
 import noteRoutes from "./routes/noteRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
 
 
 dotenv.config({
@@ -27,7 +28,8 @@ app.get("/", (req, res) => {
 });
 
 app.use(authRouter);
-app.use("/api/notes",noteRoutes);
+app.use("/api/notes", noteRoutes);
+app.use("/api/settings", settingsRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
