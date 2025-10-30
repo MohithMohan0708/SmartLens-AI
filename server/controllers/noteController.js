@@ -3,6 +3,87 @@ import { supabase } from "../services/supabaseClient.js";
 import { queries } from "../db/queries.js";
 import { extractTextFromImage, extractTextFromPDF } from "../services/ocrService.js";
 
+export const getUserNotes = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { data, error } = await supabase
+      .from("notes")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Fetch notes error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch notes.",
+        error: error.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: data.length,
+      notes: data,
+    });
+  } catch (err) {
+    console.error("Get user notes error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve notes.",
+      error: err.message,
+    });
+  }
+};
+
+export const getNoteById = async (req, res) => {
+  try {
+    const noteId = parseInt(req.params.noteId);
+    const authenticatedUserId = parseInt(req.user.id);
+
+    const { data, error } = await supabase
+      .from("notes")
+      .select("*")
+      .eq("id", noteId)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return res.status(404).json({
+          success: false,
+          message: "Note not found.",
+        });
+      }
+      console.error("Fetch note error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch note.",
+        error: error.message,
+      });
+    }
+
+    if (data.user_id !== authenticatedUserId) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. This note belongs to another user.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      note: data,
+    });
+  } catch (err) {
+    console.error("Get note by ID error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve note.",
+      error: err.message,
+    });
+  }
+};
+
 export const uploadNote = async (req, res) => {
   try {
     const userId = req.user.id;
