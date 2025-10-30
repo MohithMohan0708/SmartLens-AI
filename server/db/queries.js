@@ -7,12 +7,12 @@ const connectionString = process.env.DATABASE_URL
 const sql = postgres(connectionString)
 
 async function verifyConnection() {
-  try {
-    const result = await sql`SELECT 1`
-    console.log('Connected to the database successfully!')
-  } catch (error) {
-    console.error('Connection failed:', error)
-  } 
+    try {
+        const result = await sql`SELECT 1`
+        console.log('Connected to the database successfully!')
+    } catch (error) {
+        console.error('Connection failed:', error)
+    }
 }
 
 verifyConnection()
@@ -50,4 +50,20 @@ const getUserCredentials = async (email) => {
     }
     return null;
 }
-export const queries = { getUserCredentials, createUser };
+
+const getUserById = async (userId) => {
+    try {
+        const user = await sql`
+        SELECT id, name, email
+        FROM users
+        WHERE id = ${userId} LIMIT 1
+    `;
+        if (user && user.length > 0) return user[0];
+        return null;
+    } catch (error) {
+        console.error("Error fetching user by ID:", error);
+        return null;
+    }
+};
+
+export const queries = { getUserCredentials, createUser, getUserById };
