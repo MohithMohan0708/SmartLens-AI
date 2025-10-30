@@ -84,6 +84,70 @@ export const getNoteById = async (req, res) => {
   }
 };
 
+export const deleteNote = async (req, res) => {
+  try {
+    const noteId = parseInt(req.params.noteId);
+    const authenticatedUserId = parseInt(req.user.id);
+
+    // First, check if the note exists and belongs to the user
+    const { data: note, error: fetchError } = await supabase
+      .from("notes")
+      .select("*")
+      .eq("id", noteId)
+      .single();
+
+    if (fetchError) {
+      if (fetchError.code === "PGRST116") {
+        return res.status(404).json({
+          success: false,
+          message: "Note not found.",
+        });
+      }
+      console.error("Fetch note error:", fetchError);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch note.",
+        error: fetchError.message,
+      });
+    }
+
+    // Check if the note belongs to the authenticated user
+    if (note.user_id !== authenticatedUserId) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. You can only delete your own notes.",
+      });
+    }
+
+    // Delete the note
+    const { error: deleteError } = await supabase
+      .from("notes")
+      .delete()
+      .eq("id", noteId);
+
+    if (deleteError) {
+      console.error("Delete note error:", deleteError);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete note.",
+        error: deleteError.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Note deleted successfully.",
+    });
+  } catch (err) {
+    console.error("Delete note error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete note.",
+      error: err.message,
+    });
+  }
+};
+
 export const uploadNote = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -173,14 +237,28 @@ export const uploadNote = async (req, res) => {
     const imageUrl = await uploadToSupabase(file, userId);
 
     let analysisResult = null;
+    let analysisError = null;
+    
     if (process.env.GEMINI_API_KEY) {
       try {
         const { analyzeText } = await import("../services/llmService.js");
         analysisResult = await analyzeText(extractedText);
         console.log("✓ LLM analysis completed\n");
-      } catch (analysisError) {
-        console.warn("LLM analysis failed:", analysisError.message);
+      } catch (error) {
+        console.warn("LLM analysis failed:", error.message);
+        analysisError = error.message;
+        
+        // Check for specific error types
+        if (error.message.includes('quota') || error.message.includes('rate limit')) {
+          analysisError = "API quota exceeded. Please try again later.";
+        } else if (error.message.includes('timeout')) {
+          analysisError = "Analysis timed out. Please try again.";
+        } else {
+          analysisError = "AI analysis temporarily unavailable.";
+        }
       }
+    } else {
+      analysisError = "AI analysis not configured.";
     }
 
     const { data, error } = await supabase
@@ -206,10 +284,13 @@ export const uploadNote = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "File uploaded, text extracted, and analyzed successfully!",
+      message: analysisResult 
+        ? "File uploaded, text extracted, and analyzed successfully!" 
+        : `File uploaded and text extracted. ${analysisError}`,
       note: data[0],
       extractedTextLength: extractedText.length,
       analysisCompleted: analysisResult !== null,
+      analysisError: analysisError,
       isDuplicate: false,
     });
   } catch (err) {
