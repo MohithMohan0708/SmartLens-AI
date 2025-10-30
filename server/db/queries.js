@@ -66,4 +66,65 @@ const getUserById = async (userId) => {
     }
 };
 
-export const queries = { getUserCredentials, createUser, getUserById };
+const updateUserProfile = async (userId, name, email) => {
+    try {
+        const user = await sql`
+        UPDATE users
+        SET name = ${name}, email = ${email}
+        WHERE id = ${userId}
+        RETURNING id, name, email
+    `;
+        if (user && user.length > 0) return user[0];
+        return null;
+    } catch (error) {
+        console.error("Error updating user profile:", error);
+        return null;
+    }
+};
+
+const updateUserPassword = async (userId, newPasswordHash) => {
+    try {
+        const result = await sql`
+        UPDATE users
+        SET password_hash = ${newPasswordHash}
+        WHERE id = ${userId}
+        RETURNING id
+    `;
+        if (result && result.length > 0) return true;
+        return false;
+    } catch (error) {
+        console.error("Error updating password:", error);
+        return false;
+    }
+};
+
+const deleteUser = async (userId) => {
+    try {
+        // First delete all notes belonging to the user
+        await sql`
+        DELETE FROM notes
+        WHERE user_id = ${userId}
+    `;
+        
+        // Then delete the user
+        const result = await sql`
+        DELETE FROM users
+        WHERE id = ${userId}
+        RETURNING id
+    `;
+        if (result && result.length > 0) return true;
+        return false;
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        return false;
+    }
+};
+
+export const queries = { 
+    getUserCredentials, 
+    createUser, 
+    getUserById, 
+    updateUserProfile, 
+    updateUserPassword,
+    deleteUser
+};
