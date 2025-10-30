@@ -9,7 +9,13 @@ export const analyzeText = async (extractedText) => {
         console.log("Starting LLM analysis...");
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-2.0-flash-exp",
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 1000,
+            }
+        });
 
         const prompt = `Analyze the following text and provide:
 1. A concise summary (2-3 sentences)
@@ -30,7 +36,14 @@ Respond in JSON format:
   "sentiment": "..."
 }`;
 
-        const result = await model.generateContent(prompt);
+        // Add timeout to prevent hanging
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Analysis timeout - request took too long')), 30000)
+        );
+
+        const analysisPromise = model.generateContent(prompt);
+        const result = await Promise.race([analysisPromise, timeoutPromise]);
+        
         const response = result.response;
         const analysisText = response.text().trim();
 
@@ -45,6 +58,18 @@ Respond in JSON format:
         return analysis;
     } catch (error) {
         console.error("LLM analysis error:", error);
-        throw new Error("Failed to analyze text with LLM");
+        
+        // Provide more specific error messages
+        if (error.message?.includes('quota')) {
+            throw new Error("API quota exceeded - too many requests");
+        } else if (error.message?.includes('rate limit')) {
+            throw new Error("Rate limit exceeded - please wait a moment");
+        } else if (error.message?.includes('timeout')) {
+            throw new Error("Analysis timeout - request took too long");
+        } else if (error.message?.includes('API key')) {
+            throw new Error("API key issue - please check configuration");
+        } else {
+            throw new Error("Failed to analyze text with AI");
+        }
     }
 };
