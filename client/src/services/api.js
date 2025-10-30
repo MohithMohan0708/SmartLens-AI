@@ -32,6 +32,13 @@ export const notesAPI = {
   }),
   getAllNotes: () => api.get('/notes/'),
   getNoteById: (noteId) => api.get(`/notes/note/${noteId}`),
+  deleteNote: (noteId) => api.delete(`/notes/note/${noteId}`),
+};
+
+export const settingsAPI = {
+  updateProfile: (data) => api.put('/settings/profile', data),
+  changePassword: (data) => api.put('/settings/password', data),
+  deleteAccount: (data) => api.delete('/settings/account', { data }),
 };
 
 export default api;
