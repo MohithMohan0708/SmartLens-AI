@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRouter from "./routes/authRouter.js";
 import cookieParser from "cookie-parser";
+import noteRoutes from "./routes/noteRoutes.js";
 
 
 dotenv.config({
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
 });
 
 app.use(authRouter);
+app.use("/api/notes",noteRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
