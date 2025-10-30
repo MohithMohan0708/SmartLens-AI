@@ -19,15 +19,13 @@ export const uploadNote = async (req, res) => {
       'image/jpeg',
       'image/jpg',
       'image/png',
-      'image/gif',
-      'image/webp',
       'application/pdf'
     ];
 
     if (!allowedMimeTypes.includes(file.mimetype)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid file type. Only images (JPEG, PNG, GIF, WEBP) and PDF are allowed."
+        message: "Invalid file type. Only images (JPG/JPEG, PNG) and PDF are allowed."
       });
     }
 
@@ -69,7 +67,40 @@ export const uploadNote = async (req, res) => {
 
     console.log(`✓ Text extraction completed using ${extractionMethod}: ${extractedText.length} characters\n`);
 
+    const { data: existingNotes, error: checkError } = await supabase
+      .from("notes")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("extracted_text", extractedText);
+
+    if (checkError) {
+      console.warn("Duplicate check failed:", checkError.message);
+    }
+
+    if (existingNotes && existingNotes.length > 0) {
+      console.log("Duplicate content detected, returning existing note");
+      return res.status(200).json({
+        success: true,
+        message: "Duplicate content detected. Returning existing note with analysis.",
+        note: existingNotes[0],
+        extractedTextLength: extractedText.length,
+        analysisCompleted: existingNotes[0].analysis_result !== null,
+        isDuplicate: true,
+      });
+    }
+
     const imageUrl = await uploadToSupabase(file, userId);
+
+    let analysisResult = null;
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const { analyzeText } = await import("../services/llmService.js");
+        analysisResult = await analyzeText(extractedText);
+        console.log("✓ LLM analysis completed\n");
+      } catch (analysisError) {
+        console.warn("LLM analysis failed:", analysisError.message);
+      }
+    }
 
     const { data, error } = await supabase
       .from("notes")
@@ -78,6 +109,7 @@ export const uploadNote = async (req, res) => {
           user_id: userId,
           original_image_url: imageUrl,
           extracted_text: extractedText,
+          analysis_result: analysisResult,
         },
       ])
       .select();
@@ -93,9 +125,11 @@ export const uploadNote = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "File uploaded and text extracted successfully!",
+      message: "File uploaded, text extracted, and analyzed successfully!",
       note: data[0],
       extractedTextLength: extractedText.length,
+      analysisCompleted: analysisResult !== null,
+      isDuplicate: false,
     });
   } catch (err) {
     console.error("Upload error:", err.message);
