@@ -29,18 +29,28 @@ const signup = async (req, res) => {
         try {
             const message = await queries.createUser(name, email, hashedPassword);
             if (message === "success") {
-                return res.json({
+                return res.status(200).json({
                     success: true,
+                    message: "User created successfully!"
                 });
             } else {
-                return res.json({
+                return res.status(200).json({
+                    success: false,
                     message: "User registration failed!",
                 });
             }
         } catch (err) {
             console.error(err);
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error"
+            });
         }
     }
+    return res.status(400).json({
+        success: false,
+        message: "Missing required fields"
+    });
 };
 
 
