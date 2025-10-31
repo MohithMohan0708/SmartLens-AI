@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL
+const connectionString = process.env.NODE_ENV === "test" ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL
 const sql = postgres(connectionString)
 
 async function verifyConnection() {
@@ -28,7 +28,10 @@ const createUser = async (name, email, password) => {
             return "error";
         }
     } catch (error) {
-        console.error("Error creating user:", error);
+        // Only log non-duplicate key errors in test environment
+        if (process.env.NODE_ENV !== 'test' || error.code !== '23505') {
+            console.error("Error creating user:", error);
+        }
         return "error";
     }
     return "success";
@@ -42,13 +45,13 @@ const getUserCredentials = async (email) => {
         FROM users
         WHERE email = ${email} LIMIT 1
     `;
-        if (user) return user[0];
+        if (user && user.length > 0) return user[0];
+        return null;
     }
     catch (error) {
         console.error("Error fetching user credentials:", error);
         return null;
     }
-    return null;
 }
 
 const getUserById = async (userId) => {
@@ -77,7 +80,10 @@ const updateUserProfile = async (userId, name, email) => {
         if (user && user.length > 0) return user[0];
         return null;
     } catch (error) {
-        console.error("Error updating user profile:", error);
+        // Only log non-duplicate key errors in test environment
+        if (process.env.NODE_ENV !== 'test' || error.code !== '23505') {
+            console.error("Error updating user profile:", error);
+        }
         return null;
     }
 };
@@ -105,7 +111,7 @@ const deleteUser = async (userId) => {
         DELETE FROM notes
         WHERE user_id = ${userId}
     `;
-        
+
         // Then delete the user
         const result = await sql`
         DELETE FROM users
@@ -120,11 +126,11 @@ const deleteUser = async (userId) => {
     }
 };
 
-export const queries = { 
-    getUserCredentials, 
-    createUser, 
-    getUserById, 
-    updateUserProfile, 
+export const queries = {
+    getUserCredentials,
+    createUser,
+    getUserById,
+    updateUserProfile,
     updateUserPassword,
     deleteUser
 };
