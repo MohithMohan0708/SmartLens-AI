@@ -147,8 +147,8 @@ const FileUpload = ({ onUploadSuccess }) => {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 className={`relative border-3 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${isDragging
-                    ? 'border-primary-500 bg-primary-50/50 scale-105'
-                    : 'border-gray-300 hover:border-primary-400 bg-white/50'
+                    ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/20 scale-105'
+                    : 'border-gray-300 dark:border-gray-600 hover:border-primary-400 dark:hover:border-primary-500 bg-white/50 dark:bg-gray-800/50'
                     }`}
             >
                 {!file ? (
@@ -159,12 +159,12 @@ const FileUpload = ({ onUploadSuccess }) => {
                                 <Upload className="h-16 w-16 text-white" />
                             </div>
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-800 mb-3 flex items-center justify-center space-x-2">
+                        <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center justify-center space-x-2">
                             <span>Drop your file here</span>
                             <Sparkles className="h-5 w-5 text-yellow-500" />
                         </h3>
-                        <p className="text-gray-600 mb-2">or click to browse from your device</p>
-                        <p className="text-sm text-gray-500 mb-6">
+                        <p className="text-gray-600 dark:text-gray-300 mb-2">or click to browse from your device</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                             Supports: JPG, JPEG, PNG, PDF • Max 10MB
                         </p>
                         <input
@@ -194,25 +194,25 @@ const FileUpload = ({ onUploadSuccess }) => {
                                 />
                             </div>
                         ) : (
-                            <div className="inline-block p-8 bg-gradient-to-r from-primary-100 to-blue-100 rounded-2xl">
-                                <FileText className="h-20 w-20 text-primary-600" />
+                            <div className="inline-block p-8 bg-gradient-to-r from-primary-100 to-blue-100 dark:from-primary-900/30 dark:to-blue-900/30 rounded-2xl">
+                                <FileText className="h-20 w-20 text-primary-600 dark:text-primary-400" />
                             </div>
                         )}
-                        <div className="flex items-center justify-center space-x-3 bg-white/80 backdrop-blur-sm rounded-xl p-4 max-w-md mx-auto">
+                        <div className="flex items-center justify-center space-x-3 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm rounded-xl p-4 max-w-md mx-auto">
                             {file.type.startsWith('image/') ? (
-                                <ImageIcon className="h-6 w-6 text-primary-600" />
+                                <ImageIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                             ) : (
-                                <FileText className="h-6 w-6 text-primary-600" />
+                                <FileText className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                             )}
-                            <span className="text-sm font-semibold text-gray-800 flex-1 truncate">{file.name}</span>
+                            <span className="text-sm font-semibold text-gray-800 dark:text-gray-100 flex-1 truncate">{file.name}</span>
                             <button
                                 onClick={removeFile}
-                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                             >
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
-                        <p className="text-sm text-gray-600 font-medium">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
                             {(file.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                     </div>
@@ -238,11 +238,11 @@ const FileUpload = ({ onUploadSuccess }) => {
             {uploading && (
                 <div className="mt-8 card p-6 space-y-4">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-gray-700">{progressMessage}</span>
-                        <span className="text-sm font-bold text-primary-600">{progress}%</span>
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{progressMessage}</span>
+                        <span className="text-sm font-bold text-primary-600 dark:text-primary-400">{progress}%</span>
                     </div>
 
-                    <div className="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="relative w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                         <div
                             className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary-500 via-blue-500 to-primary-600 rounded-full transition-all duration-500 ease-out"
                             style={{ width: `${progress}%` }}
@@ -251,8 +251,8 @@ const FileUpload = ({ onUploadSuccess }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-center space-x-2 text-gray-600 pt-2">
-                        <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
+                    <div className="flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-300 pt-2">
+                        <Loader2 className="h-5 w-5 animate-spin text-primary-600 dark:text-primary-400" />
                         <span className="text-sm font-medium">Please wait while we process your document...</span>
                     </div>
                 </div>
