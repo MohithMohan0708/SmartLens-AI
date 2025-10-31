@@ -1,6 +1,7 @@
 import { queries } from "../db/queries.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import validator from "validator";
 
 const saltRounds = 9;
 const isProduction = process.env.NODE_ENV === 'production';
@@ -14,6 +15,13 @@ export const updateProfile = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Name and email are required",
+            });
+        }
+
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid email format",
             });
         }
 
