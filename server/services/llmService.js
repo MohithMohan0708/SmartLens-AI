@@ -9,19 +9,27 @@ export const analyzeText = async (extractedText) => {
         console.log("Starting LLM analysis...");
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ 
+        const model = genAI.getGenerativeModel({
             model: "gemini-2.0-flash-exp",
             generationConfig: {
                 temperature: 0.7,
-                maxOutputTokens: 1000,
+                maxOutputTokens: 2048, // Increased to allow longer responses for large documents
             }
         });
 
-        const prompt = `Analyze the following text and provide:
-1. A concise summary (2-3 sentences)
-2. Key points or main ideas (3-5 bullet points)
-3. Important keywords or topics (5-10 words)
-4. Sentiment/tone (positive, negative, neutral, or mixed)
+        const prompt = `You are analyzing a document. Automatically adjust the depth and detail of your analysis based on the content's length and complexity.
+
+ADAPTIVE ANALYSIS RULES:
+- For short documents (< 500 words): Provide concise summaries and essential points
+- For medium documents (500-2000 words): Provide comprehensive summaries and detailed points
+- For long documents (2000-5000 words): Provide extensive summaries and thorough analysis
+- For very long documents (5000+ words): Provide in-depth summaries and exhaustive point extraction
+
+IMPORTANT: Do NOT artificially limit yourself. Extract ALL significant information proportional to the document's scope.
+- Summary: Scale naturally with content (short docs = 3-5 sentences, long docs = 15-20+ sentences)
+- Key Points: Extract ALL major themes and ideas (aim for 1 key point per 200-300 words of content)
+- Keywords: Identify all relevant terms (scale from 5-8 for short docs to 15-20+ for long docs)
+- Be thorough and comprehensive - longer documents deserve more detailed analysis
 
 Text to analyze:
 """
@@ -30,20 +38,29 @@ ${extractedText}
 
 Respond in JSON format:
 {
-  "summary": "...",
-  "keyPoints": ["...", "...", "..."],
-  "keywords": ["...", "...", "..."],
-  "sentiment": "..."
-}`;
+  "summary": "Comprehensive summary proportional to document length...",
+  "keyPoints": ["point1", "point2", "point3", ...],
+  "keywords": ["keyword1", "keyword2", "keyword3", ...],
+  "sentiment": "positive/negative/neutral/mixed",
+  "category": "work/personal/study/meeting/todo/notes/other",
+  "actionItems": ["action1", "action2", ...],
+  "entities": {
+    "people": ["person1", "person2", ...],
+    "dates": ["date1", "date2", ...],
+    "places": ["place1", "place2", ...]
+  }
+}
+
+Extract all meaningful information without artificial constraints.`;
 
         // Add timeout to prevent hanging
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Analysis timeout - request took too long')), 30000)
         );
 
         const analysisPromise = model.generateContent(prompt);
         const result = await Promise.race([analysisPromise, timeoutPromise]);
-        
+
         const response = result.response;
         const analysisText = response.text().trim();
 
@@ -58,7 +75,7 @@ Respond in JSON format:
         return analysis;
     } catch (error) {
         console.error("LLM analysis error:", error);
-        
+
         // Provide more specific error messages
         if (error.message?.includes('quota')) {
             throw new Error("API quota exceeded - too many requests");
