@@ -5,6 +5,7 @@ import authRouter from "./routes/authRouter.js";
 import cookieParser from "cookie-parser";
 import noteRoutes from "./routes/noteRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
+import { apiLimiter } from "./middleware/rateLimiter.js";
 
 
 dotenv.config({
@@ -22,6 +23,10 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
+// Apply rate limiting to all API routes (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  app.use('/api/', apiLimiter);
+}
 
 app.get("/", (req, res) => {
     res.send("Welcome to SmartLens AI API");
