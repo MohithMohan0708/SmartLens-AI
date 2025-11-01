@@ -6,16 +6,17 @@ dotenv.config();
 const connectionString = process.env.NODE_ENV === "test" ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL
 const sql = postgres(connectionString)
 
-async function verifyConnection() {
-    try {
-        const result = await sql`SELECT 1`
-        console.log('Connected to the database successfully!')
-    } catch (error) {
-        console.error('Connection failed:', error)
-    }
+// Verify database connection on startup (only in non-test environment)
+if (process.env.NODE_ENV !== 'test') {
+    setTimeout(async () => {
+        try {
+            await sql`SELECT 1`;
+            console.log('Connected to the database successfully!');
+        } catch (error) {
+            console.log('⚠️  Database connection will be established on first query');
+        }
+    }, 100);
 }
-
-verifyConnection()
 
 const createUser = async (name, email, password) => {
     try {

@@ -152,6 +152,7 @@ export const uploadNote = async (req, res) => {
   try {
     const userId = req.user.id;
     const file = req.file;
+    const { title } = req.body || {};
 
     if (!file) {
       return res.status(400).json({
@@ -261,11 +262,15 @@ export const uploadNote = async (req, res) => {
       analysisError = "AI analysis not configured.";
     }
 
+    // Auto-generate title if not provided
+    const noteTitle = title || extractedText.substring(0, 50).trim() + (extractedText.length > 50 ? '...' : '');
+
     const { data, error } = await supabase
       .from("notes")
       .insert([
         {
           user_id: userId,
+          title: noteTitle,
           original_image_url: imageUrl,
           extracted_text: extractedText,
           analysis_result: analysisResult,
