@@ -1,14 +1,16 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Upload, LayoutDashboard, Brain, Sparkles, ChevronDown, Settings } from 'lucide-react';
+import { LogOut, Upload, LayoutDashboard, Brain, Sparkles, ChevronDown, Settings, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
 import ThemeToggle from './ThemeToggle';
+import AboutModal from './AboutModal';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -22,9 +24,10 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
+    <>
     <nav className="glass-effect sticky top-0 z-50 border-b border-white/20 dark:border-slate-700/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-20 relative">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="relative">
@@ -101,10 +104,10 @@ const Navbar = () => {
                 {showDropdown && (
                   <>
                     <div 
-                      className="fixed inset-0 z-10" 
+                      className="fixed inset-0 z-40" 
                       onClick={() => setShowDropdown(false)}
                     ></div>
-                    <div className="absolute right-0 mt-2 w-64 card p-2 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute right-0 mt-2 w-64 card p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 shadow-2xl">
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{user.name}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
@@ -127,6 +130,17 @@ const Navbar = () => {
                         <Settings className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                         <span className="text-sm font-medium">Settings</span>
                       </Link>
+
+                      <button
+                        onClick={() => {
+                          setShowDropdown(false);
+                          setShowAboutModal(true);
+                        }}
+                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors text-gray-700 dark:text-gray-300 mt-1"
+                      >
+                        <HelpCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                        <span className="text-sm font-medium">About SmartLens AI</span>
+                      </button>
 
                       <button
                         onClick={() => {
@@ -165,6 +179,10 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+    
+    {/* About Modal - Outside nav for proper positioning */}
+    {showAboutModal && <AboutModal isOpen={showAboutModal} onClose={() => setShowAboutModal(false)} />}
+  </>
   );
 };
 

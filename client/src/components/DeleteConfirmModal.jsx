@@ -1,45 +1,52 @@
-import { AlertTriangle, X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 
-const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, loading }) => {
+const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, title, message, isDeleting }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scaleIn">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-red-100 rounded-xl">
-              <AlertTriangle className="h-6 w-6 text-red-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900">Delete Note?</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 relative animate-scale-in">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          disabled={isDeleting}
+          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        {/* Icon */}
+        <div className="flex justify-center mb-4">
+          <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
+            <AlertTriangle className="h-12 w-12 text-red-600 dark:text-red-400" />
           </div>
-          <button
-            onClick={onClose}
-            disabled={loading}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="h-5 w-5 text-gray-500" />
-          </button>
         </div>
 
-        <p className="text-gray-600 mb-6 leading-relaxed">
-          Are you sure you want to delete this note? This action cannot be undone and all analysis data will be permanently removed.
+        {/* Title */}
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 text-center mb-2">
+          {title || 'Confirm Deletion'}
+        </h3>
+
+        {/* Message */}
+        <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+          {message || 'Are you sure you want to delete this? This action cannot be undone.'}
         </p>
 
+        {/* Actions */}
         <div className="flex space-x-3">
           <button
             onClick={onClose}
-            disabled={loading}
-            className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors disabled:opacity-50"
+            disabled={isDeleting}
+            className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            disabled={loading}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center justify-center space-x-2"
+            disabled={isDeleting}
+            className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
-            {loading ? (
+            {isDeleting ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 <span>Deleting...</span>

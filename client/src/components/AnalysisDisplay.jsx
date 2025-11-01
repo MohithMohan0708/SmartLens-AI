@@ -1,6 +1,21 @@
-import { FileText, Lightbulb, Tag, Heart, Sparkles, Download } from 'lucide-react';
+import { FileText, Lightbulb, Tag, Heart, Sparkles, Download, Copy, Check } from 'lucide-react';
+import { useState } from 'react';
+import { showSuccess } from '../utils/toast';
 
 const AnalysisDisplay = ({ analysis, extractedText, showDownload = false, onDownload }) => {
+    const [copied, setCopied] = useState(false);
+
+    const copyToClipboard = async (text, label) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+            showSuccess(`${label} copied to clipboard!`);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
+
     if (!analysis) {
         return (
             <div className="card p-8 text-center">
@@ -53,14 +68,27 @@ const AnalysisDisplay = ({ analysis, extractedText, showDownload = false, onDown
                 </div>
             )}
 
-            <div className="card p-6 bg-gradient-to-br from-yellow-50 to-orange-50">
-                <div className="flex items-center space-x-3 mb-4">
-                    <div className="p-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl">
-                        <Lightbulb className="h-5 w-5 text-white" />
+            <div className="card p-6 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl">
+                            <Lightbulb className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">AI Summary</h3>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">AI Summary</h3>
+                    <button
+                        onClick={() => copyToClipboard(analysis.summary, 'Summary')}
+                        className="p-2 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg transition-colors"
+                        title="Copy summary"
+                    >
+                        {copied ? (
+                            <Check className="h-5 w-5 text-green-600" />
+                        ) : (
+                            <Copy className="h-5 w-5 text-yellow-700 dark:text-yellow-400" />
+                        )}
+                    </button>
                 </div>
-                <p className="text-gray-800 leading-relaxed font-medium">{analysis.summary}</p>
+                <p className="text-gray-800 dark:text-gray-200 leading-relaxed font-medium">{analysis.summary}</p>
             </div>
 
             <div className="card p-6">
