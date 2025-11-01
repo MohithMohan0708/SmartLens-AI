@@ -1,12 +1,8 @@
-import { useState } from 'react';
 import { Calendar, Eye, Sparkles, Trash2, FileImage, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import DeleteConfirmModal from './DeleteConfirmModal';
 
 const NoteCard = ({ note, onDelete }) => {
   const navigate = useNavigate();
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -27,21 +23,11 @@ const NoteCard = ({ note, onDelete }) => {
     return gradients[sentiment?.toLowerCase()] || gradients.neutral;
   };
 
-  const handleDelete = async () => {
-    setDeleting(true);
-    try {
-      await onDelete(note.id);
-      setShowDeleteModal(false);
-    } catch (error) {
-      console.error('Delete failed:', error);
-    } finally {
-      setDeleting(false);
-    }
-  };
+
 
   return (
     <>
-      <div className="card p-6 flex flex-col hover:shadow-2xl transition-shadow duration-300 relative h-[450px]">
+      <div className="card p-6 flex flex-col hover:shadow-2xl transition-shadow duration-300 relative min-h-[450px]">
         {/* Header Section - Fixed Height */}
         <div className="flex items-start justify-between mb-4 h-8">
           <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
@@ -54,6 +40,15 @@ const NoteCard = ({ note, onDelete }) => {
             </span>
           )}
         </div>
+
+        {/* Title Section */}
+        {note.title && (
+          <div className="mb-3">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 line-clamp-2">
+              {note.title}
+            </h3>
+          </div>
+        )}
 
         {/* Extracted Text Section - Fixed Height */}
         <div className="mb-4 h-16">
@@ -84,24 +79,26 @@ const NoteCard = ({ note, onDelete }) => {
           )}
         </div>
 
-        {/* Keywords Section - Fixed Height */}
-        <div className="mb-4 h-10">
-          {note.analysis_result?.keywords && (
-            <div className="flex flex-wrap gap-2">
-              {note.analysis_result.keywords.slice(0, 3).map((keyword, index) => (
+        {/* Keywords Section - Flexible Height */}
+        <div className="mb-4 min-h-[2.5rem]">
+          {note.analysis_result?.keywords && note.analysis_result.keywords.length > 0 ? (
+            <div className="flex flex-wrap gap-2 items-start">
+              {note.analysis_result.keywords.slice(0, 4).map((keyword, index) => (
                 <span
                   key={index}
-                  className="px-3 py-1 bg-gradient-to-r from-primary-100 to-blue-100 dark:from-primary-900/50 dark:to-blue-900/50 text-primary-700 dark:text-primary-300 rounded-lg text-xs font-semibold"
+                  className="px-3 py-1 bg-gradient-to-r from-primary-100 to-blue-100 dark:from-primary-900/50 dark:to-blue-900/50 text-primary-700 dark:text-primary-300 rounded-lg text-xs font-semibold whitespace-nowrap"
                 >
                   #{keyword}
                 </span>
               ))}
-              {note.analysis_result.keywords.length > 3 && (
-                <span className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-lg text-xs font-semibold">
-                  +{note.analysis_result.keywords.length - 3} more
+              {note.analysis_result.keywords.length > 4 && (
+                <span className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-lg text-xs font-semibold whitespace-nowrap">
+                  +{note.analysis_result.keywords.length - 4}
                 </span>
               )}
             </div>
+          ) : (
+            <div className="h-10"></div>
           )}
         </div>
 
@@ -126,7 +123,7 @@ const NoteCard = ({ note, onDelete }) => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setShowDeleteModal(true);
+                onDelete(note.id, note.title);
               }}
               className="p-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors duration-200 flex items-center justify-center"
               title="Delete note"
@@ -143,13 +140,6 @@ const NoteCard = ({ note, onDelete }) => {
           </div>
         </div>
       </div>
-
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDelete}
-        loading={deleting}
-      />
     </>
   );
 };
