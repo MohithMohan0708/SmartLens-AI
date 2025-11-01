@@ -1,14 +1,17 @@
 import { useState, useRef } from 'react';
 import { Upload, X, FileText, Image as ImageIcon, Loader2, Sparkles } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const FileUpload = ({ onUploadSuccess }) => {
     const [file, setFile] = useState(null);
+    const [title, setTitle] = useState('');
     const [preview, setPreview] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
     const [progress, setProgress] = useState(0);
     const [progressMessage, setProgressMessage] = useState('');
+    const [extractedTextLength, setExtractedTextLength] = useState(0);
     const fileInputRef = useRef(null);
 
     const handleDragOver = (e) => {
@@ -34,15 +37,21 @@ const FileUpload = ({ onUploadSuccess }) => {
 
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
         if (!validTypes.includes(selectedFile.type)) {
-            setError('Invalid file type. Please upload JPG, JPEG, PNG, or PDF only.');
+            const errorMsg = 'Invalid file type. Please upload JPG, JPEG, PNG, or PDF only.';
+            setError(errorMsg);
+            toast.error(errorMsg);
             return;
         }
 
         const maxSize = 10 * 1024 * 1024;
         if (selectedFile.size > maxSize) {
-            setError('File too large. Maximum size is 10MB.');
+            const errorMsg = 'File too large. Maximum size is 10MB.';
+            setError(errorMsg);
+            toast.error(errorMsg);
             return;
         }
+        
+        toast.success('File selected successfully!');
 
         setFile(selectedFile);
 
@@ -64,8 +73,10 @@ const FileUpload = ({ onUploadSuccess }) => {
 
     const removeFile = () => {
         setFile(null);
+        setTitle('');
         setPreview(null);
         setError('');
+        setExtractedTextLength(0);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -73,7 +84,9 @@ const FileUpload = ({ onUploadSuccess }) => {
 
     const handleUpload = async () => {
         if (!file) {
-            setError('Please select a file first');
+            const errorMsg = 'Please select a file first';
+            setError(errorMsg);
+            toast.error(errorMsg);
             return;
         }
 
@@ -83,6 +96,9 @@ const FileUpload = ({ onUploadSuccess }) => {
 
         const formData = new FormData();
         formData.append('file', file);
+        if (title.trim()) {
+            formData.append('title', title.trim());
+        }
 
         // Simulate progress stages
         const progressStages = [
@@ -116,6 +132,7 @@ const FileUpload = ({ onUploadSuccess }) => {
             if (data.success) {
                 setProgress(100);
                 setProgressMessage('✅ Analysis complete!');
+                toast.success('Note uploaded and analyzed successfully!');
                 setTimeout(() => {
                     onUploadSuccess(data);
                     removeFile();
@@ -123,13 +140,17 @@ const FileUpload = ({ onUploadSuccess }) => {
                     setProgressMessage('');
                 }, 500);
             } else {
-                setError(data.message || 'Upload failed');
+                const errorMsg = data.message || 'Upload failed';
+                setError(errorMsg);
+                toast.error(errorMsg);
                 setProgress(0);
                 setProgressMessage('');
             }
         } catch (err) {
             clearInterval(progressInterval);
-            setError('Upload failed. Please try again.');
+            const errorMsg = 'Upload failed. Please try again.';
+            setError(errorMsg);
+            toast.error(errorMsg);
             console.error('Upload error:', err);
             setProgress(0);
             setProgressMessage('');
@@ -190,7 +211,7 @@ const FileUpload = ({ onUploadSuccess }) => {
                                 <img
                                     src={preview}
                                     alt="Preview"
-                                    className="max-h-80 rounded-2xl shadow-2xl border-4 border-white"
+                                    className="max-h-80 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-700"
                                 />
                             </div>
                         ) : (
@@ -215,6 +236,39 @@ const FileUpload = ({ onUploadSuccess }) => {
                         <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
                             {(file.size / 1024 / 1024).toFixed(2)} MB
                         </p>
+                        
+                        {/* Title Input */}
+                        <div className="max-w-md mx-auto">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                Note Title (Optional)
+                            </label>
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="Enter a title for your note..."
+                                maxLength={100}
+                                className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:border-primary-500 dark:focus:border-primary-400 focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-900/30 transition-all"
+                            />
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {title.length}/100 characters
+                            </p>
+                        </div>
+                        
+                        {/* Character Requirement Info */}
+                        <div className="max-w-md mx-auto bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4">
+                            <div className="flex items-start space-x-3">
+                                <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                                        Text Extraction Required
+                                    </p>
+                                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                                        Your file must contain at least <span className="font-bold">200 characters</span> of readable text for AI analysis.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

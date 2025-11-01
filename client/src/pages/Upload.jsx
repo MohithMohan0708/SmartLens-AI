@@ -29,7 +29,83 @@ const Upload = () => {
       </div>
 
       {!uploadResult ? (
-        <FileUpload onUploadSuccess={handleUploadSuccess} />
+        <>
+          {/* Compact SmartLens AI Info - Top */}
+          <div className="card p-4 mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div>
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100">What SmartLens AI Does</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">OCR extraction → AI analysis → Smart organization → Action items</p>
+                </div>
+              </div>
+              <button
+                onClick={() => document.getElementById('info-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline whitespace-nowrap"
+              >
+                Learn More ↓
+              </button>
+            </div>
+          </div>
+          
+          <FileUpload onUploadSuccess={handleUploadSuccess} />
+          
+          {/* Detailed Info Section - Bottom */}
+          <div id="info-section" className="card p-6 mt-12 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-200 dark:border-blue-800">
+            <div className="flex items-start space-x-4">
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex-shrink-0">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                  How SmartLens AI Works
+                </h2>
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  SmartLens AI uses advanced OCR and AI technology to extract, analyze, and organize your handwritten notes automatically.
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold">1</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">Text Extraction</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Converts handwritten notes to digital text using OCR</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold">2</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">AI Analysis</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Generates summaries, key points, and insights</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold">3</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">Smart Organization</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Categorizes notes and extracts keywords automatically</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold">4</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">Action Items</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Identifies tasks, dates, and important entities</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
         <div className="space-y-8">
           <div className={`card p-6 ${uploadResult.isDuplicate ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20' : 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'}`}>
