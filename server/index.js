@@ -19,12 +19,28 @@ const PORT = process.env.PORT || 5000;
 // Trust proxy for Docker/Nginx deployment
 app.set('trust proxy', 1);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Increase payload size limits for file uploads
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // CORS configuration for production deployment
+const allowedOrigins = [
+    'http://localhost',
+    'http://localhost:3000',
+    'https://smartlens-ai.onrender.com',
+    process.env.FRONTEND_URL
+].filter(Boolean);
+
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || true,
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(null, true); // Allow all in production for now
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -41,9 +57,20 @@ app.get("/", (req, res) => {
     res.send("Welcome to SmartLens AI API");
 });
 
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(authRouter);
 app.use("/api/notes", noteRoutes);
 app.use("/api/settings", settingsRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(err.status || 500).json({
+        error: err.message || 'Internal server error'
+    });
+});
 
 // Only start server if not in test environment
 if (process.env.NODE_ENV !== 'test') {
