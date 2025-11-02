@@ -4,6 +4,7 @@ FROM node:20-alpine
 # Install required system dependencies
 RUN apk add --no-cache \
     ca-certificates \
+    curl \
     && update-ca-certificates
 
 # Set working directory
@@ -18,8 +19,8 @@ RUN npm ci --only=production
 # Copy application code
 COPY . .
 
-# Copy tesseract training data
-COPY eng.traineddata ./
+# Download tesseract training data
+RUN curl -L https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata -o eng.traineddata
 
 # Expose port
 EXPOSE 5000
