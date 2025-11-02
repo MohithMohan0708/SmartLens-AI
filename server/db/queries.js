@@ -4,7 +4,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const connectionString = process.env.NODE_ENV === "test" ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL
-const sql = postgres(connectionString)
+
+// Configure postgres with connection options
+const sql = postgres(connectionString, {
+    connect_timeout: 10,
+    idle_timeout: 20,
+    max_lifetime: 60 * 30
+})
 
 // Verify database connection on startup (only in non-test environment)
 if (process.env.NODE_ENV !== 'test') {

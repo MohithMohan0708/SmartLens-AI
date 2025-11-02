@@ -16,11 +16,20 @@ dotenv.config({
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for Docker/Nginx deployment
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-    credentials: true
-}));
+
+// CORS configuration for production deployment
+const corsOptions = {
+    origin: process.env.FRONTEND_URL || true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
 app.use(cookieParser());
 
 // Apply rate limiting to all API routes (skip in test environment)
