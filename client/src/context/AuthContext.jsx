@@ -25,8 +25,14 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const response = await authAPI.login({ email, password });
     if (response.data.success) {
-      // Store user info in localStorage since cookie is httpOnly
-      const userInfo = { email, name: response.data.name || email.split('@')[0] };
+      // Store token and user info in localStorage
+      const token = response.data.token;
+      const userInfo = { 
+        email, 
+        name: response.data.name || email.split('@')[0],
+        token 
+      };
+      localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userInfo));
       setUser(userInfo);
     }
@@ -42,6 +48,7 @@ export const AuthProvider = ({ children }) => {
     await authAPI.logout();
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (

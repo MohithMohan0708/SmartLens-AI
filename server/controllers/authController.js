@@ -86,15 +86,20 @@ const login = async (req, res) => {
                 name: userData.name,
                 email: userData.email,
             }, process.env.JWT_SECRET_KEY, { expiresIn: '24h' });
+            // Set cookie for backward compatibility
             res.cookie("token", token, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
                 secure: isProduction,
                 sameSite: isProduction ? 'None' : 'Lax'
             });
+            
+            // Also return token in response for cross-domain support
             return res.json({
                 success: true,
                 message: "Login success!",
+                token: token,
+                name: userData.name
             });
         } else {
             return res.status(401).json({
