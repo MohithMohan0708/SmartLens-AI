@@ -119,13 +119,10 @@ const FileUpload = ({ onUploadSuccess }) => {
         }, 800);
 
         try {
-            const response = await fetch('/api/notes/upload', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include',
-            });
-
-            const data = await response.json();
+            // Import the API instance dynamically to use configured base URL
+            const { notesAPI } = await import('../services/api.js');
+            const response = await notesAPI.upload(formData);
+            const data = response.data;
 
             clearInterval(progressInterval);
 
@@ -148,7 +145,7 @@ const FileUpload = ({ onUploadSuccess }) => {
             }
         } catch (err) {
             clearInterval(progressInterval);
-            const errorMsg = 'Upload failed. Please try again.';
+            const errorMsg = err.response?.data?.message || 'Upload failed. Please try again.';
             setError(errorMsg);
             toast.error(errorMsg);
             console.error('Upload error:', err);

@@ -57,9 +57,6 @@ app.get("/", (req, res) => {
     res.send("Welcome to SmartLens AI API");
 });
 
-// Handle preflight requests
-app.options('*', cors(corsOptions));
-
 app.use(authRouter);
 app.use("/api/notes", noteRoutes);
 app.use("/api/settings", settingsRoutes);
@@ -67,7 +64,30 @@ app.use("/api/settings", settingsRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
+    
+    // Handle Multer errors
+    if (err.name === 'MulterError') {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+                success: false,
+                message: 'File too large. Maximum size is 10MB.'
+            });
+        }
+        if (err.code === 'LIMIT_FILE_COUNT') {
+            return res.status(400).json({
+                success: false,
+                message: 'Too many files. Only 1 file allowed per upload.'
+            });
+        }
+        return res.status(400).json({
+            success: false,
+            message: err.message || 'File upload error'
+        });
+    }
+    
+    // Handle other errors
     res.status(err.status || 500).json({
+        success: false,
         error: err.message || 'Internal server error'
     });
 });
