@@ -28,7 +28,7 @@ services:
   frontend:
     build:
       context: ./client
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.local
     container_name: smartlens-frontend
     ports:
       - "80:80"
