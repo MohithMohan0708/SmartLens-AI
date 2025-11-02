@@ -141,7 +141,7 @@ const Upload = () => {
                     <p className="text-gray-700 dark:text-gray-200 mb-3">
                       {uploadResult.analysisError || 'The AI analysis could not be generated at this time.'}
                     </p>
-                    <div className="bg-white/60 dark:bg-gray-800/60 rounded-lg p-4 border border-yellow-200 dark:border-yellow-700">
+                    <div className="bg-white/60 dark:bg-gray-800/60 rounded-lg p-4 border border-yellow-200 dark:border-yellow-700 mb-4">
                       <p className="text-sm text-gray-700 dark:text-gray-200 font-medium mb-2">💡 Possible reasons:</p>
                       <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1 list-disc list-inside">
                         <li>API rate limit reached (too many requests)</li>
@@ -149,9 +149,16 @@ const Upload = () => {
                         <li>Temporary service unavailability</li>
                       </ul>
                       <p className="text-sm text-gray-700 dark:text-gray-200 font-medium mt-3">
-                        ✅ Your text was extracted successfully and saved. You can try re-uploading later for AI analysis.
+                        ✅ Your text was extracted successfully and saved.
                       </p>
                     </div>
+                    <button
+                      onClick={() => setUploadResult(null)}
+                      className="w-full btn-primary py-3 flex items-center justify-center space-x-2"
+                    >
+                      <RefreshCw className="h-5 w-5" />
+                      <span>Re-upload to Retry AI Analysis</span>
+                    </button>
                   </div>
                 </div>
               </div>

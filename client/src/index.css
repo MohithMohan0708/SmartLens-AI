@@ -18,11 +18,11 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+    @apply bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-700 hover:to-blue-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-h-[44px] text-sm sm:text-base;
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-xl border-2 border-gray-200 hover:border-primary-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200;
+    @apply bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-4 sm:px-6 rounded-xl border-2 border-gray-200 hover:border-primary-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 min-h-[44px] text-sm sm:text-base;
   }
   
   .dark .btn-secondary {
@@ -38,7 +38,25 @@
   }
   
   .card {
-    @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 border border-gray-100;
+    @apply bg-white/90 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl hover:shadow-2xl transition-all duration-200 border border-gray-100;
+  }
+  
+  /* Mobile-optimized spacing */
+  .mobile-container {
+    @apply px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8;
+  }
+  
+  /* Responsive text sizes */
+  .text-responsive-xl {
+    @apply text-2xl sm:text-3xl md:text-4xl;
+  }
+  
+  .text-responsive-lg {
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+  
+  .text-responsive-md {
+    @apply text-lg sm:text-xl md:text-2xl;
   }
   
   .dark .card {
