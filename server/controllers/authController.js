@@ -27,16 +27,16 @@ const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     if (name && hashedPassword && email) {
         try {
-            const message = await queries.createUser(name, email, hashedPassword);
-            if (message === "success") {
+            const result = await queries.createUser(name, email, hashedPassword);
+            if (result.success) {
                 return res.status(200).json({
                     success: true,
-                    message: "User created successfully!"
+                    message: result.message
                 });
             } else {
-                return res.status(200).json({
+                return res.status(400).json({
                     success: false,
-                    message: "User registration failed!",
+                    message: result.message
                 });
             }
         } catch (err) {

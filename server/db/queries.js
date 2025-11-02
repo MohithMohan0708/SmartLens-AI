@@ -32,16 +32,20 @@ const createUser = async (name, email, password) => {
         RETURNING id, name, email
     `;
         if (!res) {
-            return "error";
+            return { success: false, message: "Failed to create user" };
         }
+        return { success: true, message: "User created successfully" };
     } catch (error) {
+        // Check for duplicate email error
+        if (error.code === '23505') {
+            return { success: false, message: "Email already registered. Please use a different email or login." };
+        }
         // Only log non-duplicate key errors in test environment
-        if (process.env.NODE_ENV !== 'test' || error.code !== '23505') {
+        if (process.env.NODE_ENV !== 'test') {
             console.error("Error creating user:", error);
         }
-        return "error";
+        return { success: false, message: "Database error occurred" };
     }
-    return "success";
 }
 
 
