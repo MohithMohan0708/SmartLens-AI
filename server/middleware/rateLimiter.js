@@ -12,21 +12,16 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Strict limiter for upload endpoint (relaxed for production shared IPs)
+// Strict limiter for upload endpoint
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 50, // Increased for production (Render may share IPs)
+  max: 50, // Limit per IP
   message: {
     success: false,
     message: 'Upload limit exceeded. Please try again later.'
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Skip rate limiting if behind proxy (Render)
-  skip: (req) => {
-    // Skip if request is from trusted proxy
-    return req.headers['x-forwarded-for'] && process.env.NODE_ENV === 'production';
-  }
 });
 
 // Auth endpoints limiter
