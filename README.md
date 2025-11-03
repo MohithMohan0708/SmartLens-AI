@@ -167,21 +167,6 @@ Access at: http://localhost:5173
 
 ---
 
-## 🎥 Demo Video
-
-Watch a 2-minute walkthrough of SmartLens AI's key features:
-
-**[📺 View Demo Video](https://your-video-link-here)**
-
-**Video Highlights:**
-- User authentication flow
-- Uploading handwritten notes
-- AI analysis in action
-- Dashboard navigation and filtering
-- Dark mode toggle
-- PDF export feature
-
----
 
 ## 📡 API Documentation
 
