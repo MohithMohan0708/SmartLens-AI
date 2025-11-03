@@ -85,10 +85,18 @@ app.use((err, req, res, next) => {
         });
     }
     
+    // Handle file filter errors (from multer fileFilter)
+    if (err.message && err.message.includes('Invalid file type')) {
+        return res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+    
     // Handle other errors
     res.status(err.status || 500).json({
         success: false,
-        error: err.message || 'Internal server error'
+        message: err.message || 'Internal server error'
     });
 });
 

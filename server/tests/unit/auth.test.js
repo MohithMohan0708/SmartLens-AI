@@ -31,8 +31,9 @@ describe('Authentication Endpoints', () => {
         .post('/api/auth/signup')
         .send(testUser);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
+      expect(response.body.message).toContain('Email already registered');
     });
 
     it('should reject invalid email', async () => {

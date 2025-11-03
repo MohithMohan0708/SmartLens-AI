@@ -20,7 +20,8 @@ describe('Database Queries', () => {
         hashedPassword
       );
 
-      expect(result).toBe('success');
+      expect(result.success).toBe(true);
+      expect(result.message).toBe('User created successfully');
     });
 
     it('should get user by email', async () => {
@@ -111,14 +112,15 @@ describe('Database Queries', () => {
         testUser.email,
         hashedPassword
       );
-      expect(firstResult).toBe('success');
+      expect(firstResult.success).toBe(true);
 
       const secondResult = await queries.createUser(
         'Another Name',
         testUser.email,
         hashedPassword
       );
-      expect(secondResult).toBe('error');
+      expect(secondResult.success).toBe(false);
+      expect(secondResult.message).toContain('Email already registered');
     });
 
     it('should return null for non-existent user', async () => {
