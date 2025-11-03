@@ -14,6 +14,13 @@ vi.mock('react-toastify', () => ({
   },
 }));
 
+// Mock the API module
+vi.mock('../../services/api.js', () => ({
+  notesAPI: {
+    upload: vi.fn(),
+  },
+}));
+
 describe('FileUpload Component', () => {
   let mockOnUploadSuccess;
   let user;
@@ -380,13 +387,17 @@ describe('FileUpload Component', () => {
   });
 
   describe('Upload Process', () => {
-    beforeEach(() => {
-      global.fetch = vi.fn();
+    let notesAPI;
+
+    beforeEach(async () => {
+      // Get the mocked API
+      const api = await import('../../services/api.js');
+      notesAPI = api.notesAPI;
     });
 
     it('should show progress during upload', async () => {
-      global.fetch.mockResolvedValueOnce({
-        json: async () => ({ success: true, note: { id: 1 } }),
+      notesAPI.upload.mockResolvedValueOnce({
+        data: { success: true, note: { id: 1 } },
       });
 
       renderWithProviders(<FileUpload onUploadSuccess={mockOnUploadSuccess} />);
@@ -406,8 +417,8 @@ describe('FileUpload Component', () => {
 
     it('should call onUploadSuccess on successful upload', async () => {
       const mockData = { success: true, note: { id: 1, title: 'Test' } };
-      global.fetch.mockResolvedValueOnce({
-        json: async () => mockData,
+      notesAPI.upload.mockResolvedValueOnce({
+        data: mockData,
       });
 
       renderWithProviders(<FileUpload onUploadSuccess={mockOnUploadSuccess} />);
@@ -426,8 +437,8 @@ describe('FileUpload Component', () => {
     });
 
     it('should show error on failed upload', async () => {
-      global.fetch.mockResolvedValueOnce({
-        json: async () => ({ success: false, message: 'Upload failed' }),
+      notesAPI.upload.mockResolvedValueOnce({
+        data: { success: false, message: 'Upload failed' },
       });
 
       renderWithProviders(<FileUpload onUploadSuccess={mockOnUploadSuccess} />);
@@ -446,7 +457,7 @@ describe('FileUpload Component', () => {
     });
 
     it('should handle network error', async () => {
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
+      notesAPI.upload.mockRejectedValueOnce(new Error('Network error'));
 
       renderWithProviders(<FileUpload onUploadSuccess={mockOnUploadSuccess} />);
 
